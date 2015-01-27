@@ -15,10 +15,16 @@ class Skills(db.Model):
 	def __repr__(self):
 		return '<Skill %r>' % (self.skillName)
 
+# section - Followers in Miguel's blog
+# skillEmpl = db.Table('skillEmpl',
+#                      db.Column('skillID', db.Integer, db.ForeignKey('skills.id')),
+#                      db.Column('emplID', db.Integer, db.ForeignKey('employees.id'))
+# 					)
+
 class skillEmpl(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	skillID = db.Column(db.Integer, db.ForeignKey('Skills.id'))
-	emplID = db.Column(db.Integer, db.ForeignKey('Employees.id'))
+	skillID = db.Column(db.Integer, db.ForeignKey('skills.id'))
+	emplID = db.Column(db.Integer, db.ForeignKey('employees.id'))
 
 	def __repr__(self):
 		return '<Empl ID %r, Skill ID %r>' % (self.emplID, self.skillID)

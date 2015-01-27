@@ -1,25 +1,48 @@
 from flask import render_template, flash, redirect
 from app import app
-from .forms import LoginForm
+from .models import Employees, Skills, skillEmpl
+from .forms import LoginForm, EditEmployee
 
 @app.route('/')
 @app.route('/index')
 def index():
-    user = {'nickname': 'Miguel'}  # fake user
-    posts = [  # fake array of posts
-        {
-            'author': {'nickname': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'nickname': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template("index.html",
+	employees = Employees.query.all()
+	skills = Skills.query.all()
+	se = skillEmpl.query.all()
+	combined = []
+
+	skillsDict = {}
+	for i in skills:
+		skillsDict[i.id] = {'skillName' : i.skillName}
+
+	emplDict = {}
+	for i in employees:
+		emplDict[i.id] = {'fName' : i.fName, 'lName' : i.lName}
+
+	for i in se:
+		combined.append({'f': emplDict[i.emplID]['fName'], 'l' :emplDict[i.emplID]['lName'], 's': skillsDict[i.skillID]['skillName']})
+
+	return render_template('index.html',
                            title='Home',
-                           user=user,
-                           posts=posts)
+                           se = combined)
+
+
+
+@app.route('/edit', methods=['GET', 'POST'])
+# @login_required
+def edit():
+    form = EditEmployee()
+    if form.validate_on_submit():
+        employees.fName = form.fName.data
+        employees.lName = form.lName.data
+        db.session.add(employees)
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('edit'))
+    else:
+        form.nickname.data = g.user.nickname
+        form.about_me.data = g.user.about_me
+    return render_template('edit.html', form=form)
 
 # suppressing login page
 # @app.route('/login', methods=['GET', 'POST'])

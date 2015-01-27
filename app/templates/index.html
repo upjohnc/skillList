@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Hi, {{ user.nickname }}!</h1>
-    {% for post in posts %}
-    <div><p>{{ post.author.nickname }} says: <b>{{ post.body }}</b></p></div>
-    {% endfor %}
+    {% for s in se %}
+      <p>
+        <h1>{{ s['f'] }} {{ s['l'] }} has this skill: {{ s['s'] }}</h1>
+      </p>
+  {% endfor %}
+  <hr>
+{#  {% for post in posts %}#}
+{#  <p>#}
+{#    {{ post.author.nickname }} says: <b>{{ post.body }}</b>#}
+{#  </p>#}
+{#  {% endfor %}#}
 {% endblock %}
