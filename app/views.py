@@ -1,5 +1,5 @@
-from flask import render_template, flash, redirect
-from app import app
+from flask import render_template, flash, redirect, url_for
+from app import app, db
 from .models import Employees, Skills, skillEmpl
 from .forms import LoginForm, EditEmployee
 
@@ -30,19 +30,20 @@ def index():
 
 @app.route('/edit', methods=['GET', 'POST'])
 # @login_required
-def edit():
-    form = EditEmployee()
-    if form.validate_on_submit():
-        employees.fName = form.fName.data
-        employees.lName = form.lName.data
-        db.session.add(employees)
-        db.session.commit()
-        flash('Your changes have been saved.')
-        return redirect(url_for('edit'))
-    else:
-        form.nickname.data = g.user.nickname
-        form.about_me.data = g.user.about_me
-    return render_template('edit.html', form=form)
+def editEmpl():
+	Empl = Employees.query.get(1)
+	form = EditEmployee()
+	if form.validate_on_submit():
+		Empl.fName = form.fName.data
+		Empl.lName = form.lName.data
+		db.session.add(Empl)
+		db.session.commit()
+		flash('Your changes have been saved.')
+		return redirect(url_for('editEmpl'))
+	else:
+		form.fName.data = Empl.fName
+		form.lName.data = Empl.lName
+	return render_template('editEmpl.html', form=form)
 
 # suppressing login page
 # @app.route('/login', methods=['GET', 'POST'])
