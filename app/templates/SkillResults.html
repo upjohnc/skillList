@@ -1,0 +1,18 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Skills</h1>
+      <table>
+      {% for i in tDict %}
+          <tr>
+              <td>Name:</td>
+              <td>{{ tDict[i].emplF }}</td>
+              <td>{{ tDict[i].emplL }}</td>
+              <td>Skill: </td>
+              <td>{{ tDict[i].sName }}</td>
+          </tr>
+      {% endfor %}
+      </table>
+  </form>
+{% endblock %}

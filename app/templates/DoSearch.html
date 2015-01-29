@@ -1,0 +1,18 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Search for Skills</h1>
+  <form action="" method="post" name="edit">
+      {{form.hidden_tag()}}
+      <table>
+          <tr>
+              <td>Search:</td>
+              <td>{{ form.skillname(size=60) }}</td>
+          </tr>
+                        <td></td>
+              <td><input type="submit" value="Save Changes"></td>
+          </tr>
+      </table>
+  </form>
+{% endblock %}

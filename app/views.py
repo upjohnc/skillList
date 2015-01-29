@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for
 from app import app, db
 from .models import Employees, Skills, skillEmpl
-from .forms import LoginForm, EditEmployee
+from .forms import LoginForm, EditEmployee, SkillSearchForm
 
 @app.route('/')
 @app.route('/index')
@@ -43,17 +43,7 @@ def editEmpl(id):
 	else:
 		form.fName.data = Empl.fName
 		form.lName.data = Empl.lName
-		# return redirect(url_for('index'))
 	return render_template('editEmpl.html', form=form)
-# EmSkillList = [(i.id, i.skillID) for i in EmSkill]
-#
-# AllSkills = models.Skills.query.all()
-# SkillDict = {}
-# for i in AllSkills:
-# 	for x in EmSkillList:
-# 		print(x)
-# 		if i.id == x[1]:
-# 			print(x[0])
 
 @app.route('/editEskill/<int:eid>', methods = ['GET', 'POST'])
 def EmplSkill(eid):
@@ -78,21 +68,35 @@ def RemoveSkill(id):
 
 @app.route('/AddSkill/<string:id>', methods=['GET', 'POST'])
 def AddSkill(id):
-
 	se = skillEmpl(skillID = int(id.split('_')[0]), emplID = int(id.split('_')[1]))
 	db.session.add(se)
 	db.session.commit()
 	return redirect(url_for('index'))
 
-# suppressing login page
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     form = LoginForm()
-#     if form.validate_on_submit():
-#         flash('Login requested for OpenID="%s", remember_me=%s' %
-#               (form.openid.data, str(form.remember_me.data)))
-#         return redirect('/index')
-#     return render_template('login.html',
-#                            title='Sign In',
-#                            form=form,
-#                            providers=app.config['OPENID_PROVIDERS'])
+@app.route('/skill/<string:tlist>')
+def showskill(tlist):
+	tlist = tlist.replace('Skill ', '').replace('skill ', '')
+	tlist = [i.strip() for i in tlist.split(',')]
+	if type(tlist) is list:
+		nameS = ['Skill ' + i for i in tlist]
+	else:
+		nameS = ['']
+		nameS.append('Skill ' + tlist)
+	skills = Skills.query.filter(Skills.skillName.in_(nameS)).all()
+	skillList = [i.id for i in skills]
+	se = skillEmpl.query.filter(skillEmpl.skillID.in_(skillList)).all()
+	resultDict = {}
+	for count, i in enumerate(se):
+		e = Employees.query.get(i.emplID)
+		s = Skills.query.get(i.skillID)
+		resultDict[count] = {'emplF': e.fName, 'emplL': e.lName, 'sName' : s.skillName}
+	return render_template('SkillResults.html', tDict = resultDict)
+
+@app.route('/SkillSearchForm', methods=['GET', 'POST'])
+def doSkillSearch():
+	form = SkillSearchForm()
+	if form.validate_on_submit():
+		return redirect(url_for('showskill', tlist=form.skillname.data))
+	else:
+		flash('Field can have a single name or multiple names separated by commas.')
+	return render_template('DoSearch.html', form=form)
