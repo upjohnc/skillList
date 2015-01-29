@@ -20,8 +20,14 @@ s = models.Skills.query.all()
 
 se = models.skillEmpl(emplID = e[0].id, skillID = s[0].id)
 db.session.add(se)
+se = models.skillEmpl(emplID = e[0].id, skillID = s[1].id)
+db.session.add(se)
 se = models.skillEmpl(emplID = e[1].id, skillID = s[1].id)
 db.session.add(se)
+db.session.commit()
+
+se = models.skillEmpl.query.get(1)
+db.session.delete(se)
 db.session.commit()
 
 print(models.skillEmpl.query.all())
