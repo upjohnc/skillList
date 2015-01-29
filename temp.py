@@ -1,8 +1,16 @@
 from app import models, db
 
-employees = models.Employees.query.all()
-for i in employees:
-	print(i)
+EmSkill = models.skillEmpl.query.filter_by(emplID=2).all()
+EmSkillList = [(i.id, i.skillID) for i in EmSkill]
+
+AllSkills = models.Skills.query.all()
+SkillDict = {}
+for i in AllSkills:
+	for x in EmSkillList:
+		print(x)
+		if i.id == x[1]:
+			print(x[0])
+
 # skills = models.Skills.query.all()
 # se = models.skillEmpl.query.all()
 # combined = []

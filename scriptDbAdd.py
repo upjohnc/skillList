@@ -10,6 +10,8 @@ s = models.Skills(skillName = 'Skill 111')
 db.session.add(s)
 s = models.Skills(skillName = 'Skill 222')
 db.session.add(s)
+s = models.Skills(skillName = 'Skill 333')
+db.session.add(s)
 db.session.commit()
 
 
@@ -24,11 +26,13 @@ se = models.skillEmpl(emplID = e[0].id, skillID = s[1].id)
 db.session.add(se)
 se = models.skillEmpl(emplID = e[1].id, skillID = s[1].id)
 db.session.add(se)
+se = models.skillEmpl(emplID = e[1].id, skillID = s[2].id)
+db.session.add(se)
 db.session.commit()
 
-se = models.skillEmpl.query.get(1)
-db.session.delete(se)
-db.session.commit()
+# se = models.skillEmpl.query.get(1)
+# db.session.delete(se)
+# db.session.commit()
 
 print(models.skillEmpl.query.all())
 
