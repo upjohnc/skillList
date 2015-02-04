@@ -7,7 +7,8 @@ class LoginForm(Form):
     remember_me = BooleanField('remember_me', default=False)
 
 class SkillSearchForm(Form):
-	skillname = StringField('skillname', validators= [DataRequired()])
+	skillname1 = StringField('skillname1', validators= [DataRequired()])
+	skillname2 = StringField('skillname2')
 
 class EditEmployee(Form):
 	fName = StringField('fName', validators= [DataRequired()])

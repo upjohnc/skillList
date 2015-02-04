@@ -75,13 +75,20 @@ def AddSkill(id):
 
 @app.route('/skill/<string:tlist>')
 def showskill(tlist):
-	tlist = tlist.replace('Skill ', '').replace('skill ', '')
-	tlist = [i.strip() for i in tlist.split(',')]
-	if type(tlist) is list:
-		nameS = ['Skill ' + i for i in tlist]
-	else:
-		nameS = ['']
-		nameS.append('Skill ' + tlist)
+	print('hello')
+	tasklist = {}
+	tempList = tlist.split('+')
+	for i in tempList:
+		print(i)
+		tasklist[i.split('_')[0]] = i.split('_')[1]
+	print(tasklist.values())
+	nameS = ['Skill ' + i for i in tasklist.values()]
+	# tlist = [i.strip() for i in tlist.split(',')]
+	# if type(tlist) is list:
+	# 	nameS = ['Skill ' + i for i in tlist]
+	# else:
+	# 	nameS = ['']
+	# 	nameS.append('Skill ' + tlist)
 	skills = Skills.query.filter(Skills.skillName.in_(nameS)).all()
 	skillList = [i.id for i in skills]
 	se = skillEmpl.query.filter(skillEmpl.skillID.in_(skillList)).all()
@@ -96,7 +103,8 @@ def showskill(tlist):
 def doSkillSearch():
 	form = SkillSearchForm()
 	if form.validate_on_submit():
-		return redirect(url_for('showskill', tlist=form.skillname.data))
+		skilllist = 'skill1_%s+skill2_%s' % (form.skillname1.data, form.skillname2.data)
+		return redirect(url_for('showskill', tlist=skilllist))
 	else:
 		flash('Field can have a single name or multiple names separated by commas.')
 	return render_template('DoSearch.html', form=form)
