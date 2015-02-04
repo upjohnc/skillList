@@ -8,7 +8,7 @@ class LoginForm(Form):
 
 class SkillSearchForm(Form):
 	skillname1 = StringField('skillname1', validators= [DataRequired()])
-	skillname2 = StringField('skillname2')
+	skillname2 = StringField('skillname2', validators= [DataRequired()])
 
 class EditEmployee(Form):
 	fName = StringField('fName', validators= [DataRequired()])
