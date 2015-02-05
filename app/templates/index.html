@@ -2,7 +2,8 @@
 {% block content %}
     {% for s in se %}
       <p>
-        <h1><a href="{{ url_for('editEmpl', id =  s.eid) }}">{{ s['f'] }}</a> {{ s['l'] }} has this skill: <div>1  {{ s['s'] }}</div><a href="{{ url_for('EmplSkill', eid = s.eid) }}">Edit Skill for Employee</a> </h1>
+        <h1><a href="{{ url_for('editEmpl', id =  s) }}">{{ se[s]['fname'] }}</a> </h1>{{ se[s]['lname'] }} has this skill: <div>1  {{ se[s]['skills'] }}</div> </h1>
+{#        <a href="{{ url_for('EmplSkill', eid = s.eid) }}">Edit Skill for Employee</a>#}
       </p>
   {% endfor %}
   <hr>

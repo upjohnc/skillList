@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for
 from app import app, db
 from .models import Employees, Skills, skillEmpl
-from .forms import LoginForm, EditEmployee, SkillSearchForm
+from .forms import LoginForm, EditEmployee, SkillSearchForm, SkillSearchFormOne, SkillSearchFormGeneral
 
 @app.route('/')
 @app.route('/index')
@@ -9,7 +9,7 @@ def index():
 	employees = Employees.query.all()
 	skills = Skills.query.all()
 	se = skillEmpl.query.all()
-	combined = []
+	combined = {}
 
 	skillsDict = {}
 	for i in skills:
@@ -20,13 +20,18 @@ def index():
 		emplDict[i.id] = {'eid' : i.id, 'fName' : i.fName, 'lName' : i.lName}
 
 	for i in se:
-		combined.append({'eid': emplDict[i.emplID]['eid'], 'f': emplDict[i.emplID]['fName'], 'l' :emplDict[i.emplID]['lName'], 's': skillsDict[i.skillID]['skillName']})
+		tempEid = emplDict[i.emplID]['eid']
+		if tempEid not in combined.keys():
+			combined[tempEid] = {'eid' : tempEid, 'fname': emplDict[i.emplID]['fName'], 'lname' :emplDict[i.emplID]['lName'], 'skills': [skillsDict[i.skillID]['skillName']]}
+			# combined[tempEid]['skills'].append(skillsDict[i.skillID]['skillName'])
+		else:
+			combined[tempEid]['skills'].append(skillsDict[i.skillID]['skillName'])
 
+		# combined.append({'eid': emplDict[i.emplID]['eid'], 'f': emplDict[i.emplID]['fName'], 'l' :emplDict[i.emplID]['lName'], 's': skillsDict[i.skillID]['skillName']})
+	print(combined)
 	return render_template('index.html',
                            title='Home',
                            se = combined)
-
-
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 # @login_required
@@ -73,14 +78,14 @@ def AddSkill(id):
 	db.session.commit()
 	return redirect(url_for('index'))
 
-@app.route('/skill/<string:tlist>')
-def showskill(tlist):
+@app.route('/skillmultiple/<string:tlist>')
+def showskillmultiple(tlist):
 	tasklist = {}
 	# parse the search field by +
 	tempList = tlist.split('+')
 	# create dict from the fields parsing the values on _
 	for i in tempList:
-		tasklist[i.split('_')[0]] = i.split('_')[1]
+		tasklist[i.split('_')[0]] = i.split('_')[1].lower().strip('skill ')
 	nameS = ['Skill ' + i for i in tasklist.values()]
 	skills = Skills.query.filter(Skills.skillName.in_(nameS)).all()
 	skillList = [i.id for i in skills]
@@ -93,9 +98,7 @@ def showskill(tlist):
 		tempEid = str(i.emplID)
 		tempSid = str(i.skillID)
 		if tempEid in emplTestDict.keys():
-			print('hell')
 			keyterm = tempEid + tempSid
-			print(keyterm)
 			resultDict[keyterm] = {'emplF': e.fName, 'emplL': e.lName, 'sName' : s.skillName}
 			keyterm = tempEid + emplTestDict[tempEid]
 			resultDict[keyterm] = {'eid' : i.emplID, 'emplF': e.fName, 'emplL': e.lName, 'sName' : emplTestDict[tempEid]}
@@ -109,7 +112,69 @@ def doSkillSearch():
 	if form.validate_on_submit():
 		# deliver search forms as seperated by + for parsing
 		skilllist = 'skill1_%s+skill2_%s' % (form.skillname1.data, form.skillname2.data)
-		return redirect(url_for('showskill', tlist=skilllist))
+		return redirect(url_for('showskillmultiple', tlist=skilllist))
 	else:
 		flash('Need both fields entered.')
-	return render_template('DoSearch.html', form=form)
+	return render_template('SearchMultiple.html', form=form)
+
+@app.route('/skillone/<string:tlist>')
+def showskillone(tlist):
+	tlist = tlist.lower().strip('skill ')
+	nameS = ['Skill ' + tlist]
+	skills = Skills.query.filter(Skills.skillName.in_(nameS)).all()
+	skillList = [i.id for i in skills]
+	se = skillEmpl.query.filter(skillEmpl.skillID.in_(skillList)).all()
+	elist = [i.emplID for i in se]
+	resultDict = {}
+	for count, i in enumerate(se):
+		e = Employees.query.get(i.emplID)
+		s = Skills.query.get(i.skillID)
+		tempEid = str(i.emplID)
+		resultDict[tempEid] = {'eid' : i.emplID, 'emplF': e.fName, 'emplL': e.lName, 'sName' : s.skillName}
+	seEmployees = skillEmpl.query.filter(skillEmpl.emplID.in_(elist)).filter(~skillEmpl.skillID.in_(skillList)).all()
+	for j in seEmployees:
+		tempEid = str(j.emplID)
+		if tempEid in resultDict.keys():
+			del resultDict[tempEid]
+	return render_template('SkillResults.html', tDict = resultDict)
+
+@app.route('/SkillSearchFormOne', methods=['GET', 'POST'])
+def doSkillSearchOne():
+	form = SkillSearchFormOne()
+	if form.validate_on_submit():
+		return redirect(url_for('showskillone', tlist=form.skillname.data))
+	else:
+		flash('Will search for employees with only this skill.')
+	return render_template('SearchOne.html', form=form)
+
+@app.route('/skillgeneral/<string:tlist>')
+def showskillgeneral(tlist):
+	tasklist = {}
+	# parse the search field by +
+	tempList = tlist.split('+')
+	# create dict from the fields parsing the values on _
+	for i in tempList:
+		tasklist[i.split('_')[0]] = i.split('_')[1].lower().strip('skill ')
+	nameS = ['Skill ' + i for i in tasklist.values()]
+	skills = Skills.query.filter(Skills.skillName.in_(nameS)).all()
+	skillList = [i.id for i in skills]
+	se = skillEmpl.query.filter(skillEmpl.skillID.in_(skillList)).all()
+	resultDict = {}
+	emplTestDict = {}
+	for count, i in enumerate(se):
+		e = Employees.query.get(i.emplID)
+		s = Skills.query.get(i.skillID)
+		resultDict[count] = {'emplF': e.fName, 'emplL': e.lName, 'sName' : s.skillName}
+
+	return render_template('SkillResults.html', tDict = resultDict)
+
+@app.route('/SkillSearchFormGeneral', methods=['GET', 'POST'])
+def doSkillSearchGeneral():
+	form = SkillSearchFormGeneral()
+	if form.validate_on_submit():
+		# deliver search forms as seperated by + for parsing
+		skilllist = 'skill1_%s+skill2_%s' % (form.skillname1.data, form.skillname2.data)
+		return redirect(url_for('showskillgeneral', tlist=skilllist))
+	else:
+		flash('Need both fields entered.')
+	return render_template('SearchGeneral.html', form=form)
