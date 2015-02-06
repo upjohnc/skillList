@@ -1,0 +1,14 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Results</h1>
+    <p>
+    {% for key, value in tDict.items() %}
+        <h4>{{ value['sName'] }}</h4>
+        <ul class="inline">
+             <li>{{ value['emplF'] }} {{ value['emplL'] }}</li>
+        </ul>
+    {% endfor %}
+    </p>
+{% endblock %}

@@ -2,17 +2,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Skills</h1>
-      <table>
-      {% for i in tDict %}
-          <tr>
-              <td>Name:</td>
-              <td>{{ tDict[i].emplF }}</td>
-              <td>{{ tDict[i].emplL }}</td>
-              <td>Skill: </td>
-              <td>{{ tDict[i].sName }}</td>
-          </tr>
-      {% endfor %}
-      </table>
-  </form>
+  <h1>Results</h1>
+    <p>
+    {% for i in sortedkeys %}
+{#    key, value in tDict.items() %}#}
+        <h4>{{ tDict[i]['skill'] }}</h4>
+        <ul class="inline">
+        {% for j in tDict[i]['empl'] %}
+             <li>{{ j }}</li>
+        {%  endfor %}
+        </ul>
+    {% endfor %}
+    </p>
 {% endblock %}

@@ -2,6 +2,7 @@ from flask import render_template, flash, redirect, url_for
 from app import app, db
 from .models import Employees, Skills, skillEmpl
 from .forms import LoginForm, EditEmployee, SkillSearchForm, SkillSearchFormOne, SkillSearchFormGeneral
+from operator import itemgetter, attrgetter
 
 @app.route('/')
 @app.route('/index')
@@ -17,14 +18,15 @@ def index():
 
 	emplDict = {}
 	for i in employees:
-		emplDict[i.id] = {'eid' : i.id, 'fName' : i.fName, 'lName' : i.lName}
+		emplDict[i.id] = {'eid' : i.id, 'fname' : i.fName, 'lname' : i.lName, 'skills' : ['']}
 
+	combined = emplDict
 	for i in se:
 		tempEid = emplDict[i.emplID]['eid']
-		if tempEid not in combined.keys():
-			combined[tempEid] = {'eid' : tempEid, 'fname': emplDict[i.emplID]['fName'], 'lname' :emplDict[i.emplID]['lName'], 'skills': [skillsDict[i.skillID]['skillName']]}
-		else:
-			combined[tempEid]['skills'].append(skillsDict[i.skillID]['skillName'])
+		# if tempEid not in combined.keys():
+		# 	combined[tempEid] = {'eid' : tempEid, 'fname': emplDict[i.emplID]['fname'], 'lname' :emplDict[i.emplID]['lname'], 'skills': [skillsDict[i.skillID]['skillName']]}
+		# else:
+		combined[tempEid]['skills'].append(skillsDict[i.skillID]['skillName'])
 
 	for key, value in combined.items():
 		combined[key]['skills'] = sorted(value['skills'])
@@ -47,6 +49,21 @@ def editEmpl(id):
 	else:
 		form.fName.data = Empl.fName
 		form.lName.data = Empl.lName
+	return render_template('editEmpl.html', form=form)
+
+@app.route('/addempl', methods=['GET', 'POST'])
+# @login_required
+def addEmpl():
+	form = EditEmployee()
+	if form.validate_on_submit():
+		e = Employees(fName = form.fName.data, lName = form.lName.data)
+		db.session.add(e)
+		db.session.commit()
+		flash('Your changes have been saved.')
+		return redirect(url_for('index'))
+	else:
+		form.fName.data = ''
+		form.lName.data = ''
 	return render_template('editEmpl.html', form=form)
 
 @app.route('/editEskill/<int:eid>', methods = ['GET', 'POST'])
@@ -86,10 +103,15 @@ def showskillmultiple(tlist):
 	for i in tempList:
 		tasklist[i.split('_')[0]] = i.split('_')[1].lower().strip('skill ')
 	nameS = ['Skill ' + i for i in tasklist.values()]
+	nameS = sorted(nameS)
+
+	resultDict = {}
+	for i in nameS:
+		resultDict[i] = {'skill' : i, 'empl' : []}
 	skills = Skills.query.filter(Skills.skillName.in_(nameS)).all()
 	skillList = [i.id for i in skills]
 	se = skillEmpl.query.filter(skillEmpl.skillID.in_(skillList)).all()
-	resultDict = {}
+	testDict = {}
 	emplTestDict = {}
 	for count, i in enumerate(se):
 		e = Employees.query.get(i.emplID)
@@ -98,12 +120,17 @@ def showskillmultiple(tlist):
 		tempSid = str(i.skillID)
 		if tempEid in emplTestDict.keys():
 			keyterm = tempEid + tempSid
-			resultDict[keyterm] = {'emplF': e.fName, 'emplL': e.lName, 'sName' : s.skillName}
+			testDict[keyterm] = {'emplF': e.fName, 'emplL': e.lName, 'sName' : s.skillName}
 			keyterm = tempEid + emplTestDict[tempEid]
-			resultDict[keyterm] = {'eid' : i.emplID, 'emplF': e.fName, 'emplL': e.lName, 'sName' : emplTestDict[tempEid]}
+			testDict[keyterm] = {'eid' : i.emplID, 'emplF': e.fName, 'emplL': e.lName, 'sName' : emplTestDict[tempEid]}
 		else:
 			emplTestDict[tempEid] = s.skillName
-	return render_template('SkillResults.html', tDict = resultDict)
+
+	# redo result dict
+	for key, values in testDict.items():
+		resultDict[values['sName']]['empl'].append(values['emplF'] + ' ' + values['emplF'])
+	# return render_template('EmplResults.html', tDict = testDict, sortedkeys = nameS)
+	return render_template('SkillResults.html', tDict = resultDict, sortedkeys = nameS)
 
 @app.route('/SkillSearchForm', methods=['GET', 'POST'])
 def doSkillSearch():
@@ -120,22 +147,29 @@ def doSkillSearch():
 def showskillone(tlist):
 	tlist = tlist.lower().strip('skill ')
 	nameS = ['Skill ' + tlist]
+	resultDict = {}
+	for i in nameS:
+		resultDict[i] = {'skill' : i, 'empl' : []}
 	skills = Skills.query.filter(Skills.skillName.in_(nameS)).all()
 	skillList = [i.id for i in skills]
 	se = skillEmpl.query.filter(skillEmpl.skillID.in_(skillList)).all()
 	elist = [i.emplID for i in se]
-	resultDict = {}
+	testDict = {}
 	for count, i in enumerate(se):
 		e = Employees.query.get(i.emplID)
 		s = Skills.query.get(i.skillID)
 		tempEid = str(i.emplID)
-		resultDict[tempEid] = {'eid' : i.emplID, 'emplF': e.fName, 'emplL': e.lName, 'sName' : s.skillName}
+		testDict[tempEid] = {'eid' : i.emplID, 'emplF': e.fName, 'emplL': e.lName, 'sName' : s.skillName}
 	seEmployees = skillEmpl.query.filter(skillEmpl.emplID.in_(elist)).filter(~skillEmpl.skillID.in_(skillList)).all()
 	for j in seEmployees:
 		tempEid = str(j.emplID)
-		if tempEid in resultDict.keys():
-			del resultDict[tempEid]
-	return render_template('SkillResults.html', tDict = resultDict)
+		if tempEid in testDict.keys():
+			del testDict[tempEid]
+	# redo result dict
+	for key, values in testDict.items():
+		resultDict[values['sName']]['empl'].append(values['emplF'] + ' ' + values['emplF'])
+	# return render_template('EmplResults.html', tDict = testDict, sortedkeys = nameS)
+	return render_template('SkillResults.html', tDict = resultDict, sortedkeys = nameS)
 
 @app.route('/SkillSearchFormOne', methods=['GET', 'POST'])
 def doSkillSearchOne():
@@ -154,18 +188,21 @@ def showskillgeneral(tlist):
 	# create dict from the fields parsing the values on _
 	for i in tempList:
 		tasklist[i.split('_')[0]] = i.split('_')[1].lower().strip('skill ')
-	nameS = ['Skill ' + i for i in tasklist.values()]
+	nameS = ['Skill ' + i for i in tasklist.values() if i]
+	nameS = sorted(nameS)
+	resultDict = {}
+	for i in nameS:
+		resultDict[i] = {'skill' : i, 'empl' : []}
+
 	skills = Skills.query.filter(Skills.skillName.in_(nameS)).all()
 	skillList = [i.id for i in skills]
 	se = skillEmpl.query.filter(skillEmpl.skillID.in_(skillList)).all()
-	resultDict = {}
-	emplTestDict = {}
+
 	for count, i in enumerate(se):
 		e = Employees.query.get(i.emplID)
 		s = Skills.query.get(i.skillID)
-		resultDict[count] = {'emplF': e.fName, 'emplL': e.lName, 'sName' : s.skillName}
-
-	return render_template('SkillResults.html', tDict = resultDict)
+		resultDict[s.skillName]['empl'].append(e.fName + ' ' + e.lName)
+	return render_template('SkillResults.html', tDict = resultDict, sortedkeys = nameS)
 
 @app.route('/SkillSearchFormGeneral', methods=['GET', 'POST'])
 def doSkillSearchGeneral():

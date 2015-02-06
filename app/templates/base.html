@@ -27,8 +27,9 @@
           <a class="brand" href="/">Employee List</a>
             <ul class="nav">
               <li><a href="{{ url_for('doSkillSearch') }}">Search Multiple Skills</a></li>
-              <li><a href="{{ url_for('doSkillSearchOne') }}">Search One Skills</a></li>
+              <li><a href="{{ url_for('doSkillSearchOne') }}">Search Single Skill Set</a></li>
               <li><a href="{{ url_for('doSkillSearchGeneral') }}">Search a few Skills</a></li>
+              <li><a href="{{ url_for('addEmpl') }}">Add Employee</a></li>
             </ul>
 {#          <div class="nav-collapse collapse">#}
 {#            {% if g.user.is_authenticated() %}#}

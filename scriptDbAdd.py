@@ -1,10 +1,23 @@
 from app import db, models
 
-e = models.Employees(fName = 'Chad', lName = 'Upjohn')
-db.session.add(e)
-e = models.Employees(fName = 'Cheryl', lName = 'Aber')
-db.session.add(e)
+import pandas as pd
+
+df = pd.read_csv('cariList.csv',  delimiter = '\t')
+
+df['first'] = df['Name'].map(lambda x: x.split(', ')[1])
+df['last'] = df['Name'].map(lambda x: x.split(', ')[0])
+
+for i in df.index:
+	e = models.Employees(fName = df.ix[i, 'first'], lName = df.ix[i, 'last'])
+	db.session.add(e)
+
 db.session.commit()
+
+# e = models.Employees(fName = 'Chad', lName = 'Upjohn')
+# db.session.add(e)
+# e = models.Employees(fName = 'Cheryl', lName = 'Aber')
+# db.session.add(e)
+# db.session.commit()
 
 s = models.Skills(skillName = 'Skill 111')
 db.session.add(s)
