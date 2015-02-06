@@ -23,12 +23,11 @@ def index():
 		tempEid = emplDict[i.emplID]['eid']
 		if tempEid not in combined.keys():
 			combined[tempEid] = {'eid' : tempEid, 'fname': emplDict[i.emplID]['fName'], 'lname' :emplDict[i.emplID]['lName'], 'skills': [skillsDict[i.skillID]['skillName']]}
-			# combined[tempEid]['skills'].append(skillsDict[i.skillID]['skillName'])
 		else:
 			combined[tempEid]['skills'].append(skillsDict[i.skillID]['skillName'])
 
-		# combined.append({'eid': emplDict[i.emplID]['eid'], 'f': emplDict[i.emplID]['fName'], 'l' :emplDict[i.emplID]['lName'], 's': skillsDict[i.skillID]['skillName']})
-	print(combined)
+	for key, value in combined.items():
+		combined[key]['skills'] = sorted(value['skills'])
 	return render_template('index.html',
                            title='Home',
                            se = combined)
