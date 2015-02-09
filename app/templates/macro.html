@@ -1,0 +1,7 @@
+{% macro nav_link(top, endpoint, name) %}
+    {% if top in request.endpoint %}
+        <li class="active"><a href="{{ url_for(endpoint) }}">{{name}}</a></li>
+    {% else %}
+        <li><a href="{{ url_for(endpoint) }}">{{name}}</a></li>
+    {% endif %}
+{% endmacro %}

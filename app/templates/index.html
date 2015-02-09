@@ -2,7 +2,7 @@
 {% block content %}
     {% for key, value in se.items() %}
       <p>
-        <h1><a href="{{ url_for('editEmpl', id =  key) }}">{{ value['fname'] }} {{ value['lname'] }} </a></h1> <h4>Skills:</h4>
+        <h3><a href="{{ url_for('editEmpl', id =  key) }}">{{ value['fname'] }} {{ value['lname'] }} </a></h3> <h4>Skills:</h4>
           <ul class="inline">
             {% for i in value['skills'] %}
              <li>{{ i }}</li>

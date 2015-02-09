@@ -1,3 +1,6 @@
+{% from "macro.html" import nav_link with context %}
+
+<!doctype html>
 <html>
   <head>
     {% if title %}
@@ -24,12 +27,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="/">Employee List</a>
-            <ul class="nav">
-              <li><a href="{{ url_for('doSkillSearch') }}">Search Multiple Skills</a></li>
-              <li><a href="{{ url_for('doSkillSearchOne') }}">Search Single Skill Set</a></li>
-              <li><a href="{{ url_for('doSkillSearchGeneral') }}">Search a few Skills</a></li>
-              <li><a href="{{ url_for('addEmpl') }}">Add Employee</a></li>
+          <a class="brand" href="/">Cari's App</a>
+            <ul class="nav navbar-nav">
+              {{ nav_link('index', 'index', 'Employee List') }}
+              {{ nav_link('doSkillSearchMulti', 'doSkillSearchMulti', 'Search Multiple Skills') }}
+              {{ nav_link('doSkillSearchOne', 'doSkillSearchOne', 'Search Single Skill Set') }}
+              {{ nav_link('doSkillSearchGeneral', 'doSkillSearchGeneral', 'Search a few Skills') }}
+              {{ nav_link('addEmpl', 'addEmpl', 'Add Employee') }}
             </ul>
 {#          <div class="nav-collapse collapse">#}
 {#            {% if g.user.is_authenticated() %}#}

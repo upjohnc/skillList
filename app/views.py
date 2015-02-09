@@ -133,7 +133,7 @@ def showskillmultiple(tlist):
 	return render_template('SkillResults.html', tDict = resultDict, sortedkeys = nameS)
 
 @app.route('/SkillSearchForm', methods=['GET', 'POST'])
-def doSkillSearch():
+def doSkillSearchMulti():
 	form = SkillSearchForm()
 	if form.validate_on_submit():
 		# deliver search forms as seperated by + for parsing
@@ -141,6 +141,7 @@ def doSkillSearch():
 		return redirect(url_for('showskillmultiple', tlist=skilllist))
 	else:
 		flash('Need both fields entered.')
+
 	return render_template('SearchMultiple.html', form=form)
 
 @app.route('/skillone/<string:tlist>')
