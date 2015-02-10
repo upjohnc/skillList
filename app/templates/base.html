@@ -13,9 +13,6 @@
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/moment.min.js"></script>
-    {% if g.locale != 'en' %}
-    <script src="/static/js/moment-{{g.locale}}.min.js"></script>
-    {% endif %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
@@ -34,6 +31,7 @@
               {{ nav_link('doSkillSearchOne', 'doSkillSearchOne', 'Search Single Skill Set') }}
               {{ nav_link('doSkillSearchGeneral', 'doSkillSearchGeneral', 'Search a few Skills') }}
               {{ nav_link('addEmpl', 'addEmpl', 'Add Employee') }}
+                {{ nav_link('addSkill', 'addSkill', 'Add Skill') }}
             </ul>
 {#          <div class="nav-collapse collapse">#}
 {#            {% if g.user.is_authenticated() %}#}

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+
 {% block content %}
+    {% include 'flash.html' %}
     {% for key, value in se.items() %}
       <p>
         <h3><a href="{{ url_for('editEmpl', id =  key) }}">{{ value['fname'] }} {{ value['lname'] }} </a></h3> <h4>Skills:</h4>

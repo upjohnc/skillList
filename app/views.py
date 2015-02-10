@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for
 from app import app, db
 from .models import Employees, Skills, skillEmpl
-from .forms import LoginForm, EditEmployee, SkillSearchForm, SkillSearchFormOne, SkillSearchFormGeneral
+from .forms import LoginForm, EditEmployee, SkillSearchForm, SkillSearchFormOne, SkillSearchFormGeneral, EditSkill
 from operator import itemgetter, attrgetter
 
 @app.route('/')
@@ -65,6 +65,27 @@ def addEmpl():
 		form.fName.data = ''
 		form.lName.data = ''
 	return render_template('editEmpl.html', form=form)
+
+@app.route('/addskill', methods=['GET', 'POST'])
+# @login_required
+def addSkill():
+	form = EditSkill()
+	if form.validate_on_submit():
+		skillData = form.sName.data.split(' ')
+		# add Skill to the name
+		if len(skillData) > 1:
+			skillData = 'Skill ' + skillData[1]
+		else:
+			skillData = 'Skill ' + skillData[0]
+
+		s = Skills(skillName = skillData)
+		db.session.add(s)
+		db.session.commit()
+		flash('Your changes have been saved.')
+		return redirect(url_for('index'))
+	else:
+		form.sName.data = ''
+	return render_template('editSkill.html', form=form)
 
 @app.route('/editEskill/<int:eid>', methods = ['GET', 'POST'])
 def EmplSkill(eid):

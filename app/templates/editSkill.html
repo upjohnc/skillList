@@ -3,17 +3,13 @@
 
 {% block content %}
     {% include 'flash.html' %}
-  <h1>Edit Employee</h1>
+  <h1>Edit Skill</h1>
   <form action="" method="post" name="edit">
       {{form.hidden_tag()}}
       <table>
           <tr>
-              <td>Employee First Name:</td>
-              <td>{{ form.fName(size=60) }}</td>
-          </tr>
-          <tr>
-              <td>Employee Last Name:</td>
-              <td>{{ form.lName(size = 60) }}</td>
+              <td>Skill Name:</td>
+              <td>{{ form.sName(size=60) }}</td>
           </tr>
           <tr>
               <td></td>
