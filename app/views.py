@@ -66,6 +66,40 @@ def addEmpl():
 		form.lName.data = ''
 	return render_template('editEmpl.html', form=form)
 
+@app.route('/showskills/')
+def showskills():
+	skills = Skills.query.all()
+	skillsDict = {}
+	for i in skills:
+		skillsDict[i.id] = {'skillName' : i.skillName}
+	return render_template('showskills.html', skills = skillsDict)
+
+@app.route('/editskill/<int:id>', methods=['GET', 'POST'])
+# @login_required
+def editSkill(id):
+	Skill = Skills.query.get(id)
+	form = EditSkill()
+	if form.validate_on_submit():
+		# Skill.skillName = form.sName.data
+		skillData = form.sName.data.split(' ')
+		# add Skill to the name
+		if len(skillData) > 1:
+			skillData = 'Skill ' + skillData[1]
+		# if no space between skill and number add space
+		elif 'skill' in skillData[0] or 'Skill' in skillData[0]:
+			skillData = 'Skill ' + skillData[0].strip('skill').strip('Skill')
+		else:
+			skillData = 'Skill ' + skillData[0]
+		Skill.skillName = skillData
+		db.session.add(Skill)
+		db.session.commit()
+		flash('Your changes have been saved.')
+		return redirect(url_for('index'))
+	else:
+		flash('You may leave off the word Skill.  It will be added if it is not included in the name you give.')
+		form.sName.data = Skill.skillName
+	return render_template('editSkill.html', form=form)
+
 @app.route('/addskill', methods=['GET', 'POST'])
 # @login_required
 def addSkill():
@@ -75,6 +109,9 @@ def addSkill():
 		# add Skill to the name
 		if len(skillData) > 1:
 			skillData = 'Skill ' + skillData[1]
+		# if no space between skill and number add space
+		elif 'skill' in skillData[0] or 'Skill' in skillData[0]:
+			skillData = 'Skill ' + skillData[0].strip('skill').strip('Skill')
 		else:
 			skillData = 'Skill ' + skillData[0]
 
@@ -84,6 +121,7 @@ def addSkill():
 		flash('Your changes have been saved.')
 		return redirect(url_for('index'))
 	else:
+		flash('You may leave off the word Skill.  It will be added if it is not included in the name you give.')
 		form.sName.data = ''
 	return render_template('editSkill.html', form=form)
 

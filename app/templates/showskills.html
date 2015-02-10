@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% include 'flash.html' %}
+    <h4><a href="{{ url_for('addSkill') }}">Add a Skill</a> </h4>
+    <ul>
+    {% for key, value in skills.items() %}
+      <p>
+        <li><a href="{{ url_for('editSkill', id =  key) }}">{{ value['skillName'] }}</a></li>
+      </p>
+      <hr>
+  {% endfor %}
+    </ul>
+  <hr>
+
+{% endblock %}
