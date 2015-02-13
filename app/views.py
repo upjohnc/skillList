@@ -68,10 +68,11 @@ def addEmpl():
 
 @app.route('/showskills/')
 def showskills():
-	skills = Skills.query.all()
+	skills = Skills.query.order_by(Skills.skillName).all()
 	skillsDict = {}
-	for i in skills:
-		skillsDict[i.id] = {'skillName' : i.skillName}
+	print(skills)
+	for counter, i in enumerate(skills):
+		skillsDict[counter] = {'skillID' : i.id, 'skillName' : i.skillName}
 	return render_template('showskills.html', skills = skillsDict)
 
 @app.route('/editskill/<int:id>', methods=['GET', 'POST'])

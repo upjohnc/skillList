@@ -6,7 +6,7 @@
         <h1>{{ e.fName }} {{ e.lName }}</h1>
       </p>
   {% for s in Es %}
-      <div>{{ Es[s].name }} {{ Es[s].trained }}
+      <div>{{ Es[s].name }}
           {% if Es[s].trained == 1 %}
               <a href="{{ url_for('RemoveSkill', id =  Es[s].Esid) }}">Remove</a>
           {% else %}
@@ -14,12 +14,5 @@
           {% endif %}
       </div>
   {% endfor %}
-
   <hr>
-{#    </div><a href="{{ url_for('EmplSkill', id = s.eid) }}">Edit Skill for Employee</a> </h1>#}
-{#  {% for post in posts %}#}
-{#  <p>#}
-{#    {{ post.author.nickname }} says: <b>{{ post.body }}</b>#}
-{#  </p>#}
-{#  {% endfor %}#}
 {% endblock %}

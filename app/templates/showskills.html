@@ -2,15 +2,17 @@
 
 {% block content %}
     {% include 'flash.html' %}
-    <h4><a href="{{ url_for('addSkill') }}">Add a Skill</a> </h4>
+    <h4><a href="{{ url_for('addSkill') }}">Add a New Skill</a> </h4>
+    <hr>
     <ul>
     {% for key, value in skills.items() %}
       <p>
-        <li><a href="{{ url_for('editSkill', id =  key) }}">{{ value['skillName'] }}</a></li>
+        <li><a href="{{ url_for('editSkill', id =  value['skillID']) }}">{{ value['skillName'] }}</a></li>
       </p>
       <hr>
   {% endfor %}
     </ul>
-  <hr>
 
+    <h4><a href="{{ url_for('addSkill') }}">Add a New Skill</a> </h4>
+<hr>
 {% endblock %}
