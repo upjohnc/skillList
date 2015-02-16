@@ -1,17 +1,5 @@
 from app import db, models
-
 import pandas as pd
-
-df = pd.read_csv('cariList.csv',  delimiter = '\t')
-
-df['first'] = df['Name'].map(lambda x: x.split(', ')[1])
-df['last'] = df['Name'].map(lambda x: x.split(', ')[0])
-
-for i in df.index:
-	e = models.Employees(fName = df.ix[i, 'first'], lName = df.ix[i, 'last'])
-	db.session.add(e)
-
-db.session.commit()
 
 temp = pd.read_csv('Agent_Daily_Prod.csv')
 temp = temp[['Split/Skill', 'Login_ID']]
@@ -49,19 +37,6 @@ for z in temp.index:
 temp['Skill'] = 'Skill ' + temp['Skill']
 temp['fname'] = temp['fname'].map(lambda x: x.strip(string.digits))
 
-temp2 = temp[['fname', 'lname', 'Skill']]
-
-skill_list = temp2['Skill'].unique()
-
-for i in skill_list:
-    s = models.Skills(skillName = i)
-    db.session.add(s)
-
-db.session.commit()
-
-
-print(models.Employees.query.all())
-
 temp3 = temp[['fname', 'lname', 'Skill']]
 
 e = models.Employees.query.all()
@@ -84,12 +59,16 @@ temp3.columns = ['fname', 'lname', 'skill', 'sid', 'skillname', 'eid']
 
 temp4 = temp3.dropna(subset = ['eid'], axis = 0)
 
-temp4.drop_duplicates(inplace=True)
+# temp4.drop_duplicates(inplace=True)
 
-for i in temp4.index:
-    se = models.skillEmpl(emplID = int(temp4.ix[i, 'eid']), skillID = int(temp4.ix[i, 'sid']))
-    db.session.add(se)
+temp4.to_csv('SkillEmployeeinapp.csv')
+mask = pd.isnull(temp3['eid'])
+temp3.ix[mask].to_csv('SkillEmployeeinappnotinapp.csv')
 
-db.session.commit()
+# for i in temp4.index:
+#     se = models.skillEmpl(emplID = int(temp4.ix[i, 'eid']), skillID = int(temp4.ix[i, 'sid']))
+#     db.session.add(se)
+#
+# db.session.commit()
 
-print(models.skillEmpl.query.all())
+# print(models.skillEmpl.query.all())

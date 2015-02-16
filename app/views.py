@@ -70,7 +70,6 @@ def addEmpl():
 def showskills():
 	skills = Skills.query.order_by(Skills.skillName).all()
 	skillsDict = {}
-	print(skills)
 	for counter, i in enumerate(skills):
 		skillsDict[counter] = {'skillID' : i.id, 'skillName' : i.skillName}
 	return render_template('showskills.html', skills = skillsDict)
